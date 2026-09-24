@@ -3,15 +3,197 @@
 <head>
   <meta charset="utf-8">
   <style>
-    body { font: 14px system-ui, sans-serif; width: 240px; padding: 8px; }
-    label { display: block; margin: 8px 0; }
-    input[type=number] { width: 70px; }
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f6f7;
+      --card: #ffffff;
+      --text: #141414;
+      --muted: #6b6b70;
+      --border: #e3e3e6;
+      --accent: #e50914;
+      --accent-soft: rgba(229, 9, 20, 0.12);
+      --track: #d4d4d8;
+      --knob: #ffffff;
+      --input-bg: #ffffff;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141414;
+        --card: #1f1f22;
+        --text: #f2f2f2;
+        --muted: #9a9aa1;
+        --border: #2c2c31;
+        --accent: #e50914;
+        --accent-soft: rgba(229, 9, 20, 0.2);
+        --track: #3a3a40;
+        --knob: #f2f2f2;
+        --input-bg: #141416;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      width: 300px;
+      padding: 14px;
+      font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .logo {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--accent);
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+    .logo svg { width: 16px; height: 16px; fill: #fff; }
+    header h1 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    header p {
+      margin: 1px 0 0;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+    }
+    .row + .row { border-top: 1px solid var(--border); }
+    .row .label { font-weight: 500; }
+    .row .hint {
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* toggle */
+    .switch { position: relative; flex: none; width: 40px; height: 24px; }
+    .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .switch span {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--track);
+      transition: background 0.18s ease;
+      cursor: pointer;
+    }
+    .switch span::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--knob);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      transition: transform 0.18s ease;
+    }
+    .switch input:checked + span { background: var(--accent); }
+    .switch input:checked + span::after { transform: translateX(16px); }
+    .switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* seconds input */
+    .seconds {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: none;
+    }
+    .seconds input {
+      width: 64px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--input-bg);
+      color: var(--text);
+      font: inherit;
+      text-align: right;
+      outline: none;
+    }
+    .seconds input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .seconds .unit { font-size: 11px; color: var(--muted); }
+
+    .row.disabled { opacity: 0.45; pointer-events: none; }
+
+    footer {
+      margin-top: 10px;
+      font-size: 10.5px;
+      color: var(--muted);
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <label><input type="checkbox" id="autoClick"> Auto-click "Skip Intro", "Skip Recap" and "Next Episode"</label>
-  <label><input type="checkbox" id="skipStart"> Skip ahead at the start of every episode</label>
-  <label>Seconds: <input type="number" id="skipSeconds" min="0" step="5"></label>
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 4l10 8-10 8V4zm12 0h3v16h-3V4z"/></svg>
+    </div>
+    <div>
+      <h1>Netflix Auto Skip Intro</h1>
+      <p>Binge without touching your computer</p>
+    </div>
+  </header>
+
+  <div class="card">
+    <label class="row">
+      <div>
+        <div class="label">Auto-click skip buttons</div>
+        <div class="hint">Skip Intro, Skip Recap and Next Episode</div>
+      </div>
+      <span class="switch"><input type="checkbox" id="autoClick"><span></span></span>
+    </label>
+
+    <label class="row">
+      <div>
+        <div class="label">Skip ahead at episode start</div>
+        <div class="hint">For shows without a skip button</div>
+      </div>
+      <span class="switch"><input type="checkbox" id="skipStart"><span></span></span>
+    </label>
+
+    <div class="row" id="secondsRow">
+      <div>
+        <div class="label">Skip amount</div>
+        <div class="hint">Seconds to jump forward</div>
+      </div>
+      <div class="seconds">
+        <input type="number" id="skipSeconds" min="0" step="5">
+        <span class="unit">s</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>No tracking · no network · only <code>storage</code> permission</footer>
+
   <script src="popup.js"></script>
 </body>
 </html>
