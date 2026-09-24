@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Netflix Auto Skip Intro",
+  "short_name": "Auto Skip Intro",
+  "version": "1.0.0",
+  "description": "Automatically skips intros, recaps and goes to the next episode on Netflix. Watch without touching your computer.",
+  "permissions": ["storage"],
+  "action": { "default_popup": "popup.html" },
+  "content_scripts": [
+    {
+      "matches": ["https://www.netflix.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.netflix.com/*"],
+      "js": ["page.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    }
+  ]
+}
